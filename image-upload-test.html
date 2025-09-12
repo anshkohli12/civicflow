@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicFlow Image Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 CivicFlow Image Upload Test</h1>
+    
+    <div class="form-group">
+        <label for="token">JWT Token (Login first to get token):</label>
+        <input type="text" id="token" placeholder="Paste your JWT token here">
+        <button onclick="login()">Get Token (Login as Messi)</button>
+    </div>
+
+    <div class="form-group">
+        <label for="issueId">Issue ID:</label>
+        <input type="number" id="issueId" value="5">
+    </div>
+
+    <div class="form-group">
+        <label for="imageFile">Select Image:</label>
+        <input type="file" id="imageFile" accept="image/*">
+    </div>
+
+    <button onclick="uploadImage()">Upload Image</button>
+
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+
+        async function login() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'messi',
+                        password: 'password123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('token').value = data.token;
+                    showResult('Login successful! Token copied to field.', 'success');
+                } else {
+                    showResult(`Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(`Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function uploadImage() {
+            const token = document.getElementById('token').value;
+            const issueId = document.getElementById('issueId').value;
+            const fileInput = document.getElementById('imageFile');
+            
+            if (!token) {
+                showResult('Please enter JWT token first (click Get Token)', 'error');
+                return;
+            }
+            
+            if (!fileInput.files[0]) {
+                showResult('Please select an image file', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            try {
+                const response = await fetch(`${API_BASE}/issues/${issueId}/image`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ Upload successful!<br>
+                        <strong>Image URL:</strong> ${data.imageUrl}<br>
+                        <strong>File Name:</strong> ${data.fileName}<br>
+                        <a href="${API_BASE}/files/images/${data.fileName}" target="_blank">View Image</a>`, 'success');
+                } else {
+                    showResult(`❌ Upload failed: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Upload error: ${error.message}`, 'error');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.className = `result ${type}`;
+        }
+    </script>
+</body>
+</html>

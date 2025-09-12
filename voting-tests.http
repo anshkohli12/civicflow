@@ -1,0 +1,131 @@
+# 🗳️ CivicFlow Voting System Tests
+
+### 1. Get JWT Token (Login as Messi)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "messi@example.com",
+  "password": "messi123"
+}
+
+### 2. Vote on an Issue - UPVOTE (replace {issueId} with actual ID)
+POST http://localhost:8080/api/issues/1/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "UPVOTE"
+}
+
+### 3. Vote on an Issue - DOWNVOTE  
+POST http://localhost:8080/api/issues/2/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "DOWNVOTE"
+}
+
+### 4. Change Vote (Update existing vote to UPVOTE)
+POST http://localhost:8080/api/issues/2/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "UPVOTE"
+}
+
+### 5. Get Vote Summary for Issue (Public - no auth needed)
+GET http://localhost:8080/api/issues/1/votes/summary
+
+### 6. Get Vote Summary for Issue (Authenticated - shows user's vote)
+GET http://localhost:8080/api/issues/1/votes/summary
+Authorization: Bearer {{jwt_token}}
+
+### 7. Get All Votes for an Issue (Public)
+GET http://localhost:8080/api/issues/1/votes
+
+### 8. Get User's Voting History (Authenticated)
+GET http://localhost:8080/api/issues/votes/my-votes
+Authorization: Bearer {{jwt_token}}
+
+### 9. Remove User's Vote from Issue
+DELETE http://localhost:8080/api/issues/1/vote
+Authorization: Bearer {{jwt_token}}
+
+### 10. Vote on Multiple Chandigarh Issues
+
+### Vote on Sector 17 Traffic Light Issue (Issue ID: should be around 6-10)
+POST http://localhost:8080/api/issues/6/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "UPVOTE"
+}
+
+### Vote on Sector 22 Sewage Issue  
+POST http://localhost:8080/api/issues/7/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "UPVOTE"
+}
+
+### Vote on Sector 35 Potholes Issue
+POST http://localhost:8080/api/issues/8/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "UPVOTE"
+}
+
+### Vote on Sector 43 Street Lighting Issue
+POST http://localhost:8080/api/issues/9/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "DOWNVOTE"
+}
+
+### Vote on Sector 46 Water Supply Issue
+POST http://localhost:8080/api/issues/10/vote
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "type": "UPVOTE"
+}
+
+### 11. Test Vote Summaries for Chandigarh Issues
+
+### Get vote summary for Sector 17 issue
+GET http://localhost:8080/api/issues/6/votes/summary
+Authorization: Bearer {{jwt_token}}
+
+### Get vote summary for Sector 22 issue  
+GET http://localhost:8080/api/issues/7/votes/summary
+Authorization: Bearer {{jwt_token}}
+
+### Get vote summary for Sector 35 issue
+GET http://localhost:8080/api/issues/8/votes/summary
+Authorization: Bearer {{jwt_token}}
+
+---
+
+## 🧪 Expected Results:
+
+1. **Vote Creation**: Should return vote details with user info
+2. **Vote Update**: Should update existing vote instead of creating new one
+3. **Vote Summary**: Should show:
+   - upvotes: number of upvotes
+   - downvotes: number of downvotes  
+   - totalScore: upvotes - downvotes
+   - userVote: current user's vote (UPVOTE/DOWNVOTE/null)
+   - hasUserVoted: true/false
+4. **Duplicate Prevention**: Same user cannot vote twice on same issue
+5. **Vote Count Update**: Issue vote_count should update in real-time

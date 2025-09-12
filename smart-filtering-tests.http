@@ -1,0 +1,147 @@
+# 🧠 Smart Filtering & Sorting Tests
+# Real-world platform-style filtering like Reddit, Facebook, LinkedIn
+
+### 1. SMART ALGORITHM (Default) - Best overall experience
+# Priority: Critical → Location → Votes → Recency
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=25&sortBy=smart
+
+### 2. LOCATION-FIRST SORTING - Closest to you
+# Perfect for "Issues near me"
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=50&sortBy=location
+
+### 3. POPULAR ISSUES - Most voted first
+# Like "Hot" or "Trending" on social platforms
+GET http://localhost:8080/api/issues/filter?sortBy=popular
+
+### 4. CRITICAL ISSUES PRIORITY - Urgent matters first
+# Emergency and critical issues get top priority
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=25&sortBy=critical
+
+### 5. NEWEST FIRST - Latest updates
+# Like "New" on Reddit
+GET http://localhost:8080/api/issues/filter?sortBy=newest
+
+### 6. CATEGORY FILTERING - Specific issue types
+
+### Infrastructure issues only
+GET http://localhost:8080/api/issues/filter?category=infrastructure&sortBy=smart
+
+### Sanitation issues only  
+GET http://localhost:8080/api/issues/filter?category=sanitation&sortBy=smart
+
+### Safety issues only
+GET http://localhost:8080/api/issues/filter?category=safety&sortBy=smart
+
+### Utilities issues only
+GET http://localhost:8080/api/issues/filter?category=utilities&sortBy=smart
+
+### 7. CRITICAL STATUS FILTERING
+
+### Only critical issues
+GET http://localhost:8080/api/issues/filter?critical=true&sortBy=smart
+
+### Only non-critical issues
+GET http://localhost:8080/api/issues/filter?critical=false&sortBy=smart
+
+### 8. VOTE-BASED FILTERING
+
+### Issues with at least 1 vote
+GET http://localhost:8080/api/issues/filter?minVotes=1&sortBy=popular
+
+### Highly voted issues (5+ votes) 
+GET http://localhost:8080/api/issues/filter?minVotes=5&sortBy=popular
+
+### 9. STATUS FILTERING
+
+### Open issues only
+GET http://localhost:8080/api/issues/filter?status=OPEN&sortBy=smart
+
+### In progress issues
+GET http://localhost:8080/api/issues/filter?status=IN_PROGRESS&sortBy=smart
+
+### Resolved issues
+GET http://localhost:8080/api/issues/filter?status=RESOLVED&sortBy=smart
+
+### 10. COMPLEX COMBINATIONS - Real-world scenarios
+
+### "Critical infrastructure issues near me"
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=15&category=infrastructure&critical=true&sortBy=smart
+
+### "Popular sanitation issues in my area"
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=20&category=sanitation&minVotes=1&sortBy=popular
+
+### "Recent safety issues nearby"  
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=10&category=safety&sortBy=newest
+
+### "All open critical issues in Chandigarh"
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=50&critical=true&status=OPEN&sortBy=critical
+
+### 11. PAGINATION EXAMPLES
+
+### First page (20 items)
+GET http://localhost:8080/api/issues/filter?page=0&size=20&sortBy=smart
+
+### Second page
+GET http://localhost:8080/api/issues/filter?page=1&size=20&sortBy=smart
+
+### Smaller page size (5 items per page)
+GET http://localhost:8080/api/issues/filter?page=0&size=5&sortBy=smart
+
+### 12. DISTANCE-BASED SCENARIOS
+
+### Very local (5km radius) - Neighborhood issues
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=5&sortBy=location
+
+### City-wide (25km radius) - City issues
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=25&sortBy=smart
+
+### Regional (100km radius) - Regional issues
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=100&sortBy=smart
+
+### 13. USER SCENARIOS
+
+### "What's happening in my neighborhood?" (Smart local feed)
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=10&sortBy=smart&page=0&size=10
+
+### "Most urgent issues in my city" (Critical priority)  
+GET http://localhost:8080/api/issues/filter?lat=30.7333&lng=76.7794&radius=25&critical=true&sortBy=critical
+
+### "Infrastructure problems people care about" (Popular infrastructure)
+GET http://localhost:8080/api/issues/filter?category=infrastructure&minVotes=1&sortBy=popular
+
+### "Latest safety reports" (Recent safety issues)
+GET http://localhost:8080/api/issues/filter?category=safety&sortBy=newest&page=0&size=15
+
+---
+
+## 🎯 Expected Smart Algorithm Behavior:
+
+1. **Critical Issues**: Always appear first regardless of votes/location
+2. **Location Priority**: Closer issues ranked higher (within 25km)  
+3. **Vote Weight**: Popular issues get priority boost
+4. **Recency Factor**: Newer issues break ties
+
+## 📊 Response Format:
+```json
+{
+  "issues": [...],
+  "pagination": {
+    "currentPage": 0,
+    "pageSize": 20, 
+    "totalItems": 45,
+    "totalPages": 3
+  },
+  "filters": {
+    "location": {"lat": 30.7333, "lng": 76.7794, "radius": 25},
+    "category": "infrastructure",
+    "critical": true,
+    "sortBy": "smart"
+  }
+}
+```
+
+## 🚀 Real-World Use Cases:
+- **Community Dashboard**: Smart feed of local issues
+- **Emergency Response**: Critical issues first  
+- **Urban Planning**: Popular infrastructure needs
+- **Citizen Engagement**: Trending issues by vote count
